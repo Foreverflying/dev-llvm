@@ -15,6 +15,7 @@ RUN chmod 644 /opt/wait_to_run.sh && \
         curl \
         flex \
         git \
+        gnupg2 \
         libncurses5 \
         lsof \
         netcat \
@@ -26,7 +27,22 @@ RUN chmod 644 /opt/wait_to_run.sh && \
         vim \
         xz-utils \
         && \
+    VERSION_CODENAME=$(cat /etc/os-release | grep VERSION_CODENAME | awk -F= {' print $2'}) && \
+    echo "deb http://apt.llvm.org/${VERSION_CODENAME}/ llvm-toolchain-${VERSION_CODENAME}-12 main" >> /etc/apt/sources.list && \
+    echo "deb-src http://apt.llvm.org/${VERSION_CODENAME}/ llvm-toolchain-${VERSION_CODENAME}-12 main" >> /etc/apt/sources.list && \
+    curl https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - && \
+    curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - && \
+    apt-get update -y && \
+    apt-get install -y \
+        clang-12 \
+        lld-12 \
+        lldb-12 \
+        llvm-12-dev \
+        nodejs \
+        && \
     apt-get autoclean && \
+    update-alternatives --install /usr/bin/cc cc /usr/lib/llvm-12/bin/clang 100 && \
+    update-alternatives --install /usr/bin/c++ c++ /usr/lib/llvm-12/bin/clang++ 100 && \
     useradd user -m -s /bin/bash && \
     mkdir -p /opt/workspace && \
     chown user:user /opt/workspace && \
@@ -34,7 +50,8 @@ RUN chmod 644 /opt/wait_to_run.sh && \
     echo 'user    ALL=(ALL)    NOPASSWD:ALL' > /etc/sudoers && \
     chmod u-w /etc/sudoers
 
-ENV PROJECT_PATH='project_not_exist' \
+ENV PATH=$PATH:/usr/lib/llvm-12/bin \
+    PROJECT_PATH='project_not_exist' \
     RUN_CMD= \
     INIT_FILE= \
     WAIT_SEC=0 \
