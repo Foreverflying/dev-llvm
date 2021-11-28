@@ -51,7 +51,7 @@ RUN chmod 644 /opt/wait_to_run.sh && \
     chmod u-w /etc/sudoers
 
 ENV PATH=$PATH:/usr/lib/llvm-12/bin \
-    PROJECT_PATH='project_not_exist' \
+    PROJECT_PATH= \
     RUN_CMD= \
     INIT_FILE= \
     WAIT_SEC=0 \
@@ -64,4 +64,4 @@ VOLUME [ "/home/user" ]
 
 WORKDIR /opt/workspace
 
-CMD sh /opt/wait_to_run.sh /opt/workspace ${PROJECT_PATH} ${WAIT_SEC} ${WAIT_HOST} ${WAIT_PORT}
+CMD sh /opt/wait_to_run.sh /opt/workspace/${PROJECT_PATH} ${WAIT_SEC} ${WAIT_HOST} ${WAIT_PORT}
